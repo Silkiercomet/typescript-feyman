@@ -4,7 +4,7 @@ typescript tiene una relacion inusual con javascript, ya que ofrece todos las ca
 
 ## explicit declaration
 
-durante la declaracion de una variable javascript analiza el contenido de esta para determinar la naturaleza de la variable, por eso, javascript es capaz de seguir cuando es imposible usar un metodo apra arreglos en un numeroo parsear un objeto a integer, pero esto es dependiente del valor de la variable de tal forma que si llega a mutar su tipo tambien lo hara, typescriot cambia esto definiendo la naturaleza de la variable es base al nombre de la variable y no a su contenido
+durante la declaracion de una variable javascript analiza el contenido de esta para determinar la naturaleza de la variable, por eso, javascript es capaz de seguir cuando es imposible usar un metodo para arreglos en un numero o parsear un objeto a integer, pero esto es dependiente del valor de la variable de tal forma que si llega a mutar, su tipo tambien lo hara, typescript cambia esto definiendo la naturaleza de la variable es base al nombre de la variable y no a su contenido
 
 ```ts
 
@@ -59,7 +59,7 @@ const user: User = new UserAccount("Murphy", 1);
 
 ### explicit declaration in FP
 
-en la programacion funcional podemos definir el typo de un parametro, la estructura o natraleza del resultado que devolvera una funcion 
+en la programacion funcional podemos definir el typo de un parametro, la estructura o naturaleza del resultado que devolvera una funcion 
 
 ```ts
 // devolvera un objeto con la estructura User
@@ -141,7 +141,48 @@ backpack.add(23) // error number is not asignable to type string;
 ```
 
 ## Structural Type System
+
+Cuando se trata de argumentos de una funcion typescript evalua la estructura del parametro siendo pasada a esta coincide con la declarada en la inicializacion de dicha funcion, de esta manera el argumento en cuestion sera comaparado y de coincider con los datos especificados se ejecutara incluso si el tipo es distinto
+
 ```ts
+interface Point {
+  x: number;
+  y: number;
+}
+ 
+function logPoint(p: Point) {
+  console.log(`${p.x}, ${p.y}`);
+}
+ 
+// logs "12, 26"
+const point = { x: 12, y: 26 };
+logPoint(point);
+
+// como veras el typo Point no es asignado a la constante point, sin embargo si es asignado al parametro por default de la funcion, lo que hara que esta busque los valores pertenecientes a la interfas y sera los que tomara durante la ejecucion
+
+const point3 = { x: 12, y: 26, z: 89 };
+logPoint(point3); // logs "12, 26"
+ 
+const rect = { x: 33, y: 3, width: 30, height: 80 };
+logPoint(rect); // logs "33, 3"
+ 
+const color = { hex: "#187ABF" };
+logPoint(color);
+/*Argument of type '{ hex: string; }' is not assignable to parameter of type 'Point'.
+  Type '{ hex: string; }' is missing the following properties from type 'Point': x, y*/
+
+class VirtualPoint {
+  x: number;
+  y: number;
+ 
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+}
+ 
+const newVPoint = new VirtualPoint(13, 56);
+logPoint(newVPoint); // logs "13, 56"
 ```
 
 ### tipos en javacript con typeof
