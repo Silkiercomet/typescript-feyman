@@ -185,6 +185,93 @@ const newVPoint = new VirtualPoint(13, 56);
 logPoint(newVPoint); // logs "13, 56"
 ```
 
+## Everyday types with typescript
+
+### tipos primitivos
+Typescript permite la declaracion explicita del tipo de una variable primitiva, aunque tambien typescript hace un buen trabajo asumiendo el typo de una variable basandose en el valor o la estructura de la variable una vez inicializada.
+
+```ts
+let myName: string = "Alice";
+```
+```ts
+let myID: number = 5;
+```
+```ts
+let married: boolean = false;
+```
+
+### type any
+este es el valor por defecto que asigna TS cuando tu no defines ningun tipo y TS no puede averiguar la naturaleza de esta, este tipo le permitira acceder a cualquier metodo o llamado de cualquier tipo
+```ts
+let obj: any = { x: 0 };
+// None of the following lines of code will throw compiler errors.
+// Using `any` disables all further type checking, and it is assumed 
+// you know the environment better than TypeScript.
+obj.foo();
+obj();
+obj.bar = 100;
+obj = "hello";
+const n: number = obj;
+```
+
+### Functions
+durante la definicion de la funcion podemos definir los tipos de los parametros que seran recibidos y del resultado que sera devuelto por la funcion, en caso de que no se devuelva nada se definira como "void" 
+```ts
+// Parameter type annotation
+function greet(name: string): void {
+  console.log("Hello, " + name.toUpperCase() + "!!");
+}
+```
+cuando definimos funciones anonimas o callbacks typescript intuira que devovlera tal operacion basandose en la anturaleza de los parametros recibidos
+```ts
+// No type annotations here, but TypeScript can spot the bug
+const names = ["Alice", "Bob", "Eve"];
+ 
+// Contextual typing for function
+names.forEach(function (s) {
+  console.log(s.toUppercase());
+// error: Property 'toUppercase' does not exist on type 'string'. Did you mean 'toUpperCase'?
+});
+
+// Contextual typing also applies to arrow functions
+names.forEach((s) => {
+  console.log(s.toUppercase());
+// error: Property 'toUppercase' does not exist on type 'string'. Did you mean 'toUpperCase'?
+});
+```
+
+### Object types
+
+podemos declarar la estructura que tendra un parametro o una variable indicando las keys y su respectivo typo de la siguiente manera
+
+```ts
+// The parameter's type annotation is an object type
+function printCoord(pt: { x: number; y: number }) {
+  console.log("The coordinate's x value is " + pt.x);
+  console.log("The coordinate's y value is " + pt.y);
+}
+printCoord({ x: 3, y: 7 });
+```
+
+#### optional types
+
+en ocasiones tendremos valores que seran opcionales y podrian no ser pasados durante la llamada de la funcion TS cuando esto ocurre JS lo toma como un valor undefined, si se interactua con dicho parametro se recibira un error TS nos permite declarar parametros que pueden ser omitidos durante la invocacion de la funcion 
+
+```ts
+function printName(obj: { first: string; last?: string }) {
+  // Error - might crash if 'obj.last' wasn't provided!
+  console.log(obj.last.toUpperCase());
+Object is possibly 'undefined'.
+  if (obj.last !== undefined) {
+    // OK
+    console.log(obj.last.toUpperCase());
+  }
+ 
+  // A safe alternative using modern JavaScript syntax:
+  console.log(obj.last?.toUpperCase());
+}
+```
+
 ### tipos en javacript con typeof
 
 string	typeof s === "string"
