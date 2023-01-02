@@ -272,6 +272,100 @@ Object is possibly 'undefined'.
 }
 ```
 
+#### union types
+
+esta es la union de dos o mas types que puede tener un valor entregado, la union de estas posibilidades da como resultado una variable que puede variar en naturaleza por ejemplo
+
+```ts
+function printId(id: number | string) {
+  if (typeof id === "string") {
+    // In this branch, id is of type 'string'
+    console.log(id.toUpperCase());
+  } else {
+    // Here, id is of type 'number'
+    console.log(id);
+  }
+}
+```
+
+cabe destacar que un parametro o variable definido con una union no podra acceder a metodos unicos de ninguno de los typos de la union, si es un metodo compartido (slice existe en string, en arraglos y en numeros) podra usarse sin ningun problema de lo contrario se debe entregar una regla para manejar los especificamente los datos que son del tipo que puede manejar el metodo como se aprecia en el anterior ejemplo donde se busca el typo de "id" antes de ejecutar toLowerCase(), otro ejemplo con un arreglo seria
+
+```ts
+function welcomePeople(x: string[] | string) {
+  if (Array.isArray(x)) {
+    // Here: 'x' is 'string[]'
+    console.log("Hello, " + x.join(" and "));
+  } else {
+    // Here: 'x' is 'string'
+    console.log("Welcome lone traveler " + x);
+  }
+}
+```
+
+## type alias
+
+en ocasiones tendremos que asignar el mismo typo en mas de una variable TS nos ofrece la posbilidad de hacer esto con el uso de "type alias's" o con el uso de interfaces, esta syntaxis nos permite pasar una estructura a un parametro o a una variable sin tener que definirla nuevamente en cada invocacion solo asignando el number del alias
+
+```ts
+interface Point {
+  x: number;
+  y: number;
+}
+ 
+function printCoord(pt: Point) {
+  console.log("The coordinate's x value is " + pt.x);
+  console.log("The coordinate's y value is " + pt.y);
+}
+ 
+printCoord({ x: 100, y: 100 });
+
+||
+
+type ID = number | string;
+```
+
+la diferencia entre estos dos es que interface es mas flexible que type alias con su contenido, ya que interface pude ser redefinida con un valor distinto al que fue inicializado con mientras que type alias no, es como la difeferencia entre "let" y "const" solo que en este caso ambas pueden ser extendidas
+
+#### type asertion
+
+Habra ocaciones en las que TS no puede tener certeza de la naturaleza del elemento inicializado, es este caso podemos hacer una asersion para informarle sobre ella y que no tengamos que lidiar con errores
+
+```ts
+const myCanvas = document.getElementById("main_canvas") as HTMLCanvasElement;
+/*|| pudes usar la sintaxis con <> si no es una rchivo tsx*/
+const myCanvas = <HTMLCanvasElement>document.getElementById("main_canvas");
+```
+
+al inicilizar dicha variable y a lo largo de su vida util el contenido del DOM es altamente mutable, de esta manera le dejamos saber a TS que tratara con un valor del DOM 
+
+#### literal types
+
+TS tambien nos permite no solo definir la structura y la naturaleza de una variable o de un parametro si no tambien su valor o contenido, en lugar de definir un typo como "string" podemos directamente usar el valor que tendra por ejemplo "hola", por si solo esto no es de mucha ayuda pero al combinar con type unions podemos declarar un set de valores con los que interectuara nuestro codigo e invaldiara todos los incorrectos 
+
+```ts
+function printText(s: string, alignment: "left" | "right" | "center") {
+  // ...
+}
+printText("Hello, world", "left");
+printText("G'day, mate", "centre");
+
+// also
+function compare(a: string, b: string): -1 | 0 | 1 {
+  return a === b ? 0 : a > b ? 1 : -1;
+}
+//also
+interface Options {
+  width: number;
+}
+function configure(x: Options | "auto") {
+  // ...
+}
+configure({ width: 100 });
+configure("auto");
+configure("automatic");
+
+```
+
 ### tipos en javacript con typeof
 
 string	typeof s === "string"
