@@ -340,20 +340,23 @@ al inicilizar dicha variable y a lo largo de su vida util el contenido del DOM e
 
 #### literal types
 
-TS tambien nos permite no solo definir la structura y la naturaleza de una variable o de un parametro si no tambien su valor o contenido, en lugar de definir un typo como "string" podemos directamente usar el valor que tendra por ejemplo "hola", por si solo esto no es de mucha ayuda pero al combinar con type unions podemos declarar un set de valores con los que interectuara nuestro codigo e invaldiara todos los incorrectos 
+TS tambien nos permite no solo definir la estructura y la naturaleza de una variable o de un parametro si no tambien su valor o contenido, en lugar de definir un typo como "string" podemos directamente usar el valor que tendra por ejemplo "hola", por si solo esto no es de mucha ayuda pero al combinar con type unions podemos declarar un set de valores con los que interectuara nuestro codigo e invaldiara todos los incorrectos.
+
+tambien puede ser combinado con interfaces y tipos no literales como se puede apreciar en el tercer ejemplo suministrado
 
 ```ts
+//1
 function printText(s: string, alignment: "left" | "right" | "center") {
   // ...
 }
 printText("Hello, world", "left");
 printText("G'day, mate", "centre");
 
-// also
+// also 2
 function compare(a: string, b: string): -1 | 0 | 1 {
   return a === b ? 0 : a > b ? 1 : -1;
 }
-//also
+//also 3
 interface Options {
   width: number;
 }
@@ -364,6 +367,85 @@ configure({ width: 100 });
 configure("auto");
 configure("automatic");
 
+```
+
+### literal inference
+
+cuando una variable es asignada un objeto como valor TS asume que sus propiedades pueden ser cambiadas en algun punto del codigo, ignorando compleamente si tal comportamiento no es deseado o seria un error
+
+```ts
+const req = { url: "https://example.com", method: "GET" };
+handleRequest(req.url, req.method);
+//error: Argument of type 'string' is not assignable to parameter of type '"GET" | "POST"'
+```
+
+TS toma este codigo como si method pudiera ser cualquier otro valor al momento de ser invocado ademas de "GET" asi que lo considera un error, la solucion es user type assertion para definir no solo el tipo si no el valor de dicha propiedad
+
+```ts
+// Change 1:
+const req = { url: "https://example.com", method: "GET" as "GET" };
+// Change 2
+handleRequest(req.url, req.method as "GET");
+```
+
+tambien podemos user el sufijo "const" para señalar que todas las propiedades de el objeto son de caracter literal y no puden cambiar de valor durante la ejecucion del codigo
+
+```ts
+const req = { url: "https://example.com", method: "GET" } as const;
+handleRequest(req.url, req.method);
+```
+
+### null and undefinde in TS
+
+TS ofrece al developer la posibilidad de de activar un flag llamada "strictNullChecks" en las dependencias de TS, dependiendo de si esta encendida o no, esta se comportara como JS (de estar desactivada) o tendras que evaluar los casos en los que se encuentre la posibilidad de alguno de los dos valores, TS ofrece el sufijo "!" que al ser definido evalua si una variable no es null ni undefined para ejecutar codigo con ella
+```ts
+function doSomething(x: string | null) {
+  if (x === null) {
+    // do nothing
+  } else {
+    console.log("Hello, " + x.toUpperCase());
+  }
+}
+//es igual que
+function liveDangerously(x?: number | null) {
+  // No error
+  console.log(x!.toFixed());
+}
+```
+
+## narrowing
+
+En TS se le llama narrowing o estrechar, a la accion de especificar el typo de una variable para ejecutar codigo especifico de ese typo en cuestion
+```ts
+//en este ejemplo se evalua si strs es un objeto y si es valido en la primera condicional en la segunda si es una cadena y en ambas se realizan acciones que son unicas para el typo de cada una, tambien se evalua si en null y si es el caso no se ejecuta nada
+function printAll(strs: string | string[] | null) {
+  if (strs && typeof strs === "object") {
+    for (const s of strs) {
+      console.log(s);
+    }
+  } else if (typeof strs === "string") {
+    console.log(strs.toLowerCase());
+  }
+}
+// en este ejemplo se evalua si X y Y son iguales ya que solo comparten un typo TS asume que ambos son strings y tienen acceso a los metodos unicos de dicho typo
+function example(x: string | number, y: string | boolean) {
+  if (x === y) {
+    // We can now call any 'string' method on 'x' or 'y'.
+    x.toUpperCase();
+          
+(method) String.toUpperCase(): string
+    y.toLowerCase();
+          
+(method) String.toLowerCase(): string
+  } else {
+    console.log(x);
+               
+(parameter) x: string | number
+    console.log(y);
+               
+(parameter) y: string | boolean
+  }
+}
 ```
 
 ### tipos en javacript con typeof
